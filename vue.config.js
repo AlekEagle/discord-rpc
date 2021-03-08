@@ -14,7 +14,7 @@ module.exports = {
           ]
         },
         linux: {
-          category: 'Internet',
+          category: 'Utilities',
           maintainer: 'rpc@alekeagle.com',
           target: [
             {
