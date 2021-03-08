@@ -63,20 +63,12 @@
     }
     mounted() {
       this.changeMaxBtn();
-      window.on('minimize', this.changeMaxBtn);
-      window.on('resize', this.changeMaxBtn);
-      window.on('resized', this.changeMaxBtn);
       window.on('unmaximize', this.changeMaxBtn);
       window.on('maximize', this.changeMaxBtn);
-      window.on('restore', this.changeMaxBtn);
     }
     beforeUnmount() {
-      window.off('minimize', this.changeMaxBtn);
-      window.off('resize', this.changeMaxBtn);
-      window.off('resized', this.changeMaxBtn);
       window.off('unmaximize', this.changeMaxBtn);
       window.off('maximize', this.changeMaxBtn);
-      window.off('restore', this.changeMaxBtn);
     }
   }
 </script>

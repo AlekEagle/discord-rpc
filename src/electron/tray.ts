@@ -36,6 +36,7 @@ menu.append(
     role: 'quit'
   })
 );
+tray.on('double-click', Main.createWindow);
 tray.setContextMenu(menu);
 export default {
   tray

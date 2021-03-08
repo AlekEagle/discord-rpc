@@ -2,15 +2,20 @@
   <div ref="footerBox" class="footer_box">
     <slot />
     <div class="cpyrit">
-      <a href="https://alekeagle.com" class="footer_text">© 2021 AlekEagle</a>
+      <p class="footer_text">© 2021 AlekEagle</p>
     </div>
   </div>
 </template>
 
 <script lang="ts">
   import { Vue } from 'vue-class-component';
+  import { shell } from 'electron';
 
-  export default class Footer extends Vue {}
+  export default class Footer extends Vue {
+    openSite() {
+      shell.openExternal('https://alekeagle.com');
+    }
+  }
 </script>
 
 <style>
@@ -24,6 +29,7 @@
     text-decoration: none;
     transition-property: color;
     transition-duration: 0.3s;
+    cursor: pointer;
   }
 
   .footer_text:hover {

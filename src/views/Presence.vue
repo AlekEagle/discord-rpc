@@ -54,7 +54,7 @@
             client.on('ready', () => {
               client.setActivity(this.getPresence());
               setInterval(() => {
-                if (client.user !== null)
+                if (client.user !== null)   
                   client.setActivity(this.getPresence());
                 else
                   client.login({
@@ -112,6 +112,7 @@
       let finalPresence = { ...this.$store.getters.presence };
       if (finalPresence.buttons && finalPresence.buttons.length < 1)
         delete finalPresence.buttons;
+      delete finalPresence.applicationID;
       if (!finalPresence.largeImageKey) {
         delete finalPresence.largeImageKey;
         delete finalPresence.largeImageText;

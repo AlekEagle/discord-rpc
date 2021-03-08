@@ -1,7 +1,10 @@
 'use strict';
-import { app, protocol, BrowserWindow, ipcMain } from 'electron';
+import { app, protocol, BrowserWindow, ipcMain, Menu, MenuItem } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
+import { Settings } from './electron/settings';
+import AutoLaunch from 'auto-launch';
+const autoLaunch = new AutoLaunch({name: 'Discord RPC'});
 const isDevelopment = process.env.NODE_ENV !== 'production';
 let mainWindow: BrowserWindow | undefined,
   presenceWindow: BrowserWindow | undefined;
@@ -9,6 +12,14 @@ let mainWindow: BrowserWindow | undefined,
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ]);
+class AppSettings extends Settings {};
+const settings = new AppSettings();
+if (!settings.has('autostart')) settings.set('autostart', true);
+(async function() {
+  if (settings.get('autostart') && !(await autoLaunch.isEnabled())) autoLaunch.enable();
+  else if (!settings.get('autostart') && await autoLaunch.isEnabled()) autoLaunch.disable();
+})();
+if (!settings.has('showonstart')) settings.set('showonstart', false);
 async function createWindow() {
   if (!mainWindow) {
     // Create the browser window.
@@ -80,6 +91,45 @@ async function createPresenceWindow() {
   }
 }
 
+ipcMain.on('ctx-mnu', event => {
+  let rCMenu = new Menu();
+  rCMenu.append(new MenuItem({
+      label: 'Settings',
+      click: () => { event.sender.send('ctx-mnu-itm', 'settings-menu') }
+    })
+  );
+  rCMenu.append(new MenuItem({
+    label: 'Help!',
+    click: () => { event.sender.send('ctx-mnu-itm', 'help') }
+  })
+);
+  rCMenu.append(new MenuItem({
+      type: 'separator'
+    })
+  );
+  rCMenu.append(new MenuItem({
+      label: 'Sneaky menu for sneaky people (sneaker!!)',
+      click: () => { event.sender.send('ctx-mnu-itm', 'sneaky-menu') }
+    })
+  );
+  rCMenu.popup({window:BrowserWindow.fromWebContents(event.sender) as BrowserWindow});
+});
+
+ipcMain.on('getSettings', (e) => {
+  e.sender.send('getSettings', settings.toJSON());
+});
+
+ipcMain.on('setSettings', (e, key, value) => {
+  settings.set(key, value);
+  e.sender.send('setSettings', settings.toJSON());
+  (async function() {
+    if (key === 'autostart') {
+      if (settings.get('autostart') && !(await autoLaunch.isEnabled())) autoLaunch.enable();
+      else if (!settings.get('autostart') && await autoLaunch.isEnabled()) autoLaunch.disable()
+    }
+  })();
+});
+
 ipcMain.on('handshake', (e, handshake: string) => {
   switch (handshake) {
     case 'main':
@@ -133,7 +183,7 @@ app.on('ready', async () => {
     }
   }
   createPresenceWindow();
-  createWindow();
+  if (settings.get('showonstart')) createWindow();
 });
 
 // Exit cleanly on request from parent process in development mode.

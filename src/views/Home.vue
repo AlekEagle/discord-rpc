@@ -176,7 +176,25 @@
     <div></div>
     <div></div>
   </div>
-  <Footer />
+  <Modal title="App Settings" :buttons="[{title: 'Close this menu', text: 'Close', action: this.hideSettingsModal}]" :cancelable="true" :show="false" ref="settingsModal">
+    <p class="modal-desc">Wow cool app settings! (Everything Autosaves)</p>
+    <form @submit.prevent="this.settings" ref="settingsForm">
+      <p class="label">Application ID</p>
+      <input class="darktextbox" type="text" placeholder="Application ID" title="The Application ID of your Rich Presence" name="appID" :value="this.getAppID" @input="this.appID" />
+
+      <label class="container">
+        <input type="checkbox" name="autostart" :checked="this.appSettings.autostart" @change="this.setAppSettings">
+        <span class="checkmark"></span><a style="color: #00000000;font-size: 22px;">__</a> Automaticlly start at startup?
+      </label>
+      <label class="container">
+        <input type="checkbox" name="showonstart" :checked="this.appSettings.showonstart" @change="this.setAppSettings">
+        <span class="checkmark"></span><a style="color: #00000000;font-size: 22px;">__</a> Show this window on startup?
+      </label>
+    </form>
+  </Modal>
+  <Footer>
+    <button class="button" @click="this.showSettingsModal">Settings</button>
+  </Footer>
 </template>
 
 <script lang="ts">
@@ -184,8 +202,9 @@
   import { Vue, Options } from 'vue-class-component';
   import Project from '@/components/Project.vue';
   import Footer from '@/components/Footer.vue';
+  import Modal from '@/components/Modal.vue';
   import { IPCPresence } from '../types';
-  import { remote, shell, ipcRenderer } from 'electron';
+  import { remote, shell, ipcRenderer, } from 'electron';
   import App from '@/App.vue';
   const eWindow = remote.getCurrentWindow();
 
@@ -197,7 +216,8 @@
   @Options({
     components: {
       Project,
-      Footer
+      Footer,
+      Modal
     },
     computed: {
       ...mapGetters({
@@ -235,9 +255,11 @@
     setButtons!: MutationMethod;
     user: any;
     assets: any;
+    appSettings!: any;
     $refs!: {
       largeIcon: any;
       smallIcon: any;
+      settingsModal: any;
     };
     $parent!: any;
     async mounted() {
@@ -245,6 +267,10 @@
         `https://discord.com/api/oauth2/applications/${this.getAppID}/assets`
       );
       this.assets = await assetsRes.json();
+      ipcRenderer.send('getSettings');
+      ipcRenderer.once('getSettings', (a, json) => {
+        this.appSettings = json;
+      })
       window.addEventListener('keydown', this.openDiscord, false);
       ipcRenderer.on('presence', (e, pres: IPCPresence) => {
         switch (pres.type) {
@@ -272,6 +298,22 @@
         }
       });
       this.handshake();
+      window.addEventListener('contextmenu', e => {
+        e.preventDefault();
+        ipcRenderer.send('ctx-mnu');
+      });
+      ipcRenderer.on('ctx-mnu-itm', (e, btn) => {
+        switch(btn) {
+          case 'sneaky-menu':
+            eWindow.webContents.openDevTools();
+            break;
+          case 'settings-menu':
+            this.showSettingsModal();
+            break;
+          case 'help':
+            shell.openExternal('https://alekeagle.com/d');
+        }
+      });
     }
 
     openDiscord(e: KeyboardEvent) {
@@ -526,11 +568,66 @@
       );
       this.setButtons(tmp);
     }
+    hideSettingsModal() {
+      this.$refs.settingsModal.hideModal();
+    }
+    showSettingsModal() {
+      this.$refs.settingsModal.showModal();
+    }
+    appID(e: Event) {
+      this.setAppID((<HTMLInputElement>e.target).value);
+      if (alertTimeout !== null) {
+        clearTimeout(alertTimeout);
+        alertTimeout = null;
+      }
+      alertTimeout = setTimeout(async () => {
+        if ((<HTMLInputElement>e.target).value !== '') {
+          this.$parent.$parent.temporaryToast(
+            "Restarting presence service with new app ID..",
+            5000
+          );
+          ipcRenderer.sendTo(presence, 'presence', <IPCPresence>{
+            type: 4
+          });
+          let assetsRes = await fetch(
+            `https://discord.com/api/oauth2/applications/${this.getAppID}/assets`
+          );
+          this.assets = await assetsRes.json();
+          this.setLargeImage({key: null, text: ''});
+          this.setSmallImage({key: null, text: ''});
+        }else {
+          this.$parent.$parent.temporaryToast(
+            "Please provide an app ID!",
+            5000
+          );
+          if (!eWindow.isFocused()) eWindow.focus();
+        }
+        alertTimeout = null;
+      }, 2000);
+    }
+    setAppSettings(e: Event) {
+      ipcRenderer.send('setSettings', (<HTMLInputElement>e.target).name, (<HTMLInputElement>e.target).type === 'checkbox' ? (<HTMLInputElement>e.target).checked : (<HTMLInputElement>e.target).value);
+      ipcRenderer.once('setSettings', (e, json) => {
+        this.appSettings = json;
+      });
+    }
   }
 </script>
 
 <style>
   .manage-buttons-btn {
     justify-self: center;
+  }
+  p.label {
+    font-size: 23px;
+    margin-bottom: 5px;
+  }
+  p.modal-desc {
+    font-size: 18px;
+    margin-top: 7px;
+    color: #c9c9c9;
+  }
+  label.container {
+    margin-top: 9px;
   }
 </style>

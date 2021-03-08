@@ -13,16 +13,13 @@ export default createStore({
       largeImageText: 'Discord RPC',
       smallImageKey: 'alek',
       smallImageText: 'Made by AlekEagle',
-      buttons: []
-    },
-    appSettings: {
-      applicationID: '556520551451983881',
-      autoStart: true
+      buttons: [],
+      applicationID: '556520551451983881'
     }
   },
   mutations: {
     appID(state: any, payload) {
-      state.appSettings.applicationID = payload;
+      state.presence.applicationID = payload;
     },
     timestamps(state: any, payload) {
       if (!payload) {
@@ -56,9 +53,6 @@ export default createStore({
       state.presence.details = payload.details;
       state.presence.state = payload.state;
     },
-    autoStart(state: any, payload) {
-      state.appSettings.autoStart = !!payload;
-    },
     buttons(state: any, payload) {
       state.presence.buttons = payload;
     }
@@ -68,7 +62,7 @@ export default createStore({
       return state.presence;
     },
     appID(state: any) {
-      return state.appSettings.applicationID;
+      return state.presence.applicationID;
     },
     timestamps(state: any) {
       return {
@@ -93,9 +87,6 @@ export default createStore({
         details: state.presence.details,
         state: state.presence.state
       };
-    },
-    autoStart(state: any) {
-      return state.appSettings.autoStart;
     },
     buttons(state: any) {
       return state.presence.buttons;
