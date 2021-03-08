@@ -103,6 +103,8 @@
         @input="this.details"
         title="Minimum Length of 2 characters!"
         minlength="2"
+        :classes="['auth']"
+        :noSpan="true"
       />
       <input
         id="state"
@@ -115,9 +117,45 @@
         minlength="2"
       />
     </Project>
-    <Project :classes="['auth']" title="Timestamps" :noSpan="true">
-      <Datepicker />
+  </div>
+  <div class="projects">
+    <Project
+      v-for="(button, index) in this.getButtons"
+      :key="index"
+      :title="`Button ${index + 1}`"
+      :classes="['auth']"
+      :noSpan="true"
+    >
+      <input
+        class="darktextbox"
+        :value="button.label"
+        @input="this.button"
+        :data-index="index"
+        placeholder="Button Text"
+        data-key="label"
+      />
+      <input
+        class="darktextbox"
+        :value="button.url"
+        @input="this.button"
+        :data-index="index"
+        placeholder="Button URL"
+        data-key="url"
+      />
+      <button
+        class="button"
+        @click="this.removeButton"
+        title="Delete this button"
+        :data-index="index"
+        >Delete this button</button
+      >
     </Project>
+    <button
+      class="button manage-buttons-btn"
+      @click="this.addButton"
+      v-if="this.getButtons.length < 2"
+      >+</button
+    >
   </div>
   <div class="projects" v-if="this.user ? this.user.id !== undefined : false">
     <Project
@@ -165,7 +203,8 @@
         getTimestamps: 'timestamps',
         getLargeImage: 'largeImage',
         getSmallImage: 'smallImage',
-        getDetails: 'details'
+        getDetails: 'details',
+        getButtons: 'buttons'
       })
     },
     methods: {
@@ -174,7 +213,8 @@
         setTimestamps: 'timestamps',
         setLargeImage: 'largeImage',
         setSmallImage: 'smallImage',
-        setDetails: 'details'
+        setDetails: 'details',
+        setButtons: 'buttons'
       })
     }
   })
@@ -184,11 +224,13 @@
     getLargeImage!: any;
     getSmallImage!: any;
     getDetails!: any;
+    getButtons!: any;
     setAppID!: MutationMethod;
     setTimestamps!: MutationMethod;
     setLargeImage!: MutationMethod;
     setSmallImage!: MutationMethod;
     setDetails!: MutationMethod;
+    setButtons!: MutationMethod;
     user: any;
     assets: any;
     $refs!: {
@@ -431,11 +473,62 @@
           }, 2000);
       }
     }
+    addButton() {
+      this.setButtons([
+        ...this.getButtons,
+        { label: 'Text Here', url: 'https://example.com/' }
+      ]);
+    }
+    button(e: InputEvent) {
+      let tmp = [...this.getButtons];
+      switch ((<HTMLInputElement>e.target).getAttribute('data-key')) {
+        case 'label':
+          tmp[
+            parseInt(
+              (<HTMLInputElement>e.target).getAttribute('data-index') as string
+            )
+          ].label = (<HTMLInputElement>e.target).value;
+          this.setButtons(tmp);
+          break;
+        case 'url':
+          tmp[
+            parseInt(
+              (<HTMLInputElement>e.target).getAttribute('data-index') as string
+            )
+          ].url = (<HTMLInputElement>e.target).value;
+          this.setButtons(tmp);
+      }
+      if (alertTimeout !== null) {
+        clearTimeout(alertTimeout);
+        alertTimeout = null;
+      }
+      alertTimeout = setTimeout(() => {
+        if ((<HTMLInputElement>e.target).value.length < 2) {
+          this.$parent.$parent.temporaryToast(
+            "You need a minimum of 2 characters for all text inputs! Your status won't be applied until you fix this.",
+            5000
+          );
+          if (!eWindow.isFocused()) eWindow.focus();
+        }
+        alertTimeout = null;
+      }, 2000);
+    }
+    removeButton(e: Event) {
+      let tmp = [...this.getButtons];
+      tmp = tmp.filter(
+        (b, i, a) =>
+          i !==
+          parseInt(
+            (<HTMLButtonElement>e.target).getAttribute('data-index') as string
+          )
+      );
+      this.setButtons(tmp);
+    }
   }
 </script>
 
 <style>
-  .v3dp__datepicker {
-    height: 250px;
+  .manage-buttons-btn {
+    justify-self: center;
   }
 </style>

@@ -5,7 +5,7 @@ import createMultiTabState from 'vuex-multi-tab-state';
 export default createStore({
   state: {
     presence: {
-      startTimestamp: Date.now(),
+      startTimestamp: null,
       endTimestamp: null,
       details: 'I just installed Discord RPC!',
       state: 'Made by AlekEagle',
@@ -96,6 +96,9 @@ export default createStore({
     },
     autoStart(state: any) {
       return state.appSettings.autoStart;
+    },
+    buttons(state: any) {
+      return state.presence.buttons;
     }
   },
   actions: {},
