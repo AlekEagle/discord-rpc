@@ -104,7 +104,7 @@
     overflow-x: scroll;
     overflow-y: overlay;
     width: 100vw;
-    height: 95.25vh;
+    height: calc(100vh - 35px);
   }
 
   button.button {

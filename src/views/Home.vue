@@ -154,11 +154,13 @@
       class="button manage-buttons-btn"
       @click="this.addButton"
       v-if="this.getButtons.length < 2"
-      >+</button
+      title="Add a button"
+      >Add Button</button
     >
   </div>
   <div class="projects" v-if="this.user ? this.user.id !== undefined : false">
     <Project
+      :classes="['float']"
       title="Current User"
       :icon="
         `https://cdn.discordapp.com/avatars/${this.user.id}/${this.user.avatar}.png`

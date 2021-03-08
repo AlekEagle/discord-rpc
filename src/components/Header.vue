@@ -109,7 +109,7 @@
   }
 
   .title-bar {
-    height: 50px;
+    height: 55px;
     background-color: #00000000;
     position: relative;
     top: 0px;

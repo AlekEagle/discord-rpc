@@ -72,12 +72,12 @@ async function createPresenceWindow() {
     await presenceWindow.loadURL(
       `${process.env.WEBPACK_DEV_SERVER_URL}#/presence-handler`
     );
+    if (!process.env.IS_TEST) presenceWindow.webContents.openDevTools();
   } else {
     createProtocol('app');
     // Load the index.html when not in development
     presenceWindow.loadURL('app://./index.html#/presence-handler');
   }
-  presenceWindow.webContents.openDevTools();
 }
 
 ipcMain.on('handshake', (e, handshake: string) => {

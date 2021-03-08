@@ -20,7 +20,7 @@ module.exports = {
             {
               target: 'appimage',
               arch: ['x64']
-            } /* ,
+            },
             {
               target: 'deb',
               arch: ['x64']
@@ -32,7 +32,7 @@ module.exports = {
             {
               target: 'pacman',
               arch: ['x64']
-            } */
+            }
           ]
         },
         mac: {
