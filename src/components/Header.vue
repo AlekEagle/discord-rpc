@@ -30,7 +30,6 @@
       /></button>
     </div>
   </div>
-  <div class="title-bar"></div>
 </template>
 <script lang="ts">
   import { Vue } from 'vue-class-component';

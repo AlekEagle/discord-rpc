@@ -104,6 +104,7 @@
     overflow-x: scroll;
     overflow-y: overlay;
     width: 100vw;
+    padding-top: 50px;
     height: calc(100vh - 35px);
   }
 
