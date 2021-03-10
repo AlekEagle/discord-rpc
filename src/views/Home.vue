@@ -176,19 +176,53 @@
     <div></div>
     <div></div>
   </div>
-  <Modal title="App Settings" :buttons="[{title: 'Close this menu', text: 'Close', action: this.hideSettingsModal}]" :cancelable="true" :show="false" ref="settingsModal">
+  <Modal
+    title="App Settings"
+    :buttons="[
+      {
+        title: 'Close this menu',
+        text: 'Close',
+        action: this.hideSettingsModal
+      }
+    ]"
+    :cancelable="true"
+    :show="false"
+    ref="settingsModal"
+  >
     <p class="modal-desc">Wow cool app settings! (Everything Autosaves)</p>
     <form @submit.prevent="this.settings" ref="settingsForm">
       <p class="label">Application ID</p>
-      <input class="darktextbox" type="text" placeholder="Application ID" title="The Application ID of your Rich Presence" name="appID" :value="this.getAppID" @input="this.appID" />
+      <input
+        class="darktextbox"
+        type="text"
+        placeholder="Application ID"
+        title="The Application ID of your Rich Presence"
+        name="appID"
+        :value="this.getAppID"
+        @input="this.appID"
+      />
 
       <label class="container">
-        <input type="checkbox" name="autostart" :checked="this.appSettings.autostart" @change="this.setAppSettings">
-        <span class="checkmark"></span><a style="color: #00000000;font-size: 22px;">__</a> Automaticlly start at startup?
+        <input
+          type="checkbox"
+          name="autostart"
+          :checked="this.appSettings.autostart"
+          @change="this.setAppSettings"
+        />
+        <span class="checkmark"></span
+        ><a style="color: #00000000;font-size: 22px;">__</a> Automaticlly start
+        at startup?
       </label>
       <label class="container">
-        <input type="checkbox" name="showonstart" :checked="this.appSettings.showonstart" @change="this.setAppSettings">
-        <span class="checkmark"></span><a style="color: #00000000;font-size: 22px;">__</a> Show this window on startup?
+        <input
+          type="checkbox"
+          name="showonstart"
+          :checked="this.appSettings.showonstart"
+          @change="this.setAppSettings"
+        />
+        <span class="checkmark"></span
+        ><a style="color: #00000000;font-size: 22px;">__</a> Show this window on
+        startup?
       </label>
     </form>
   </Modal>
@@ -204,12 +238,11 @@
   import Footer from '@/components/Footer.vue';
   import Modal from '@/components/Modal.vue';
   import { IPCPresence } from '../types';
-  import { remote, shell, ipcRenderer, } from 'electron';
+  import { remote, shell, ipcRenderer } from 'electron';
   import App from '@/App.vue';
   const eWindow = remote.getCurrentWindow();
 
   let presence: number,
-    restPeriod: number,
     timeout: ReturnType<typeof setTimeout> | null,
     alertTimeout: ReturnType<typeof setTimeout> | null;
 
@@ -270,7 +303,7 @@
       ipcRenderer.send('getSettings');
       ipcRenderer.once('getSettings', (a, json) => {
         this.appSettings = json;
-      })
+      });
       window.addEventListener('keydown', this.openDiscord, false);
       ipcRenderer.on('presence', (e, pres: IPCPresence) => {
         switch (pres.type) {
@@ -279,8 +312,7 @@
             break;
           case 1:
             console.log('Successfully connected to presence handler.');
-            restPeriod = pres.payload ? pres.payload['restPeriod'] + 500 : 5500;
-            this.user = pres.payload.user;
+            this.user = pres.payload;
             this.createTimeout();
             break;
           case 2:
@@ -297,13 +329,25 @@
             break;
         }
       });
+      window.addEventListener(
+        'beforeunload',
+        () => {
+          if (typeof timeout === 'number') clearInterval(timeout);
+          timeout = null;
+          ipcRenderer.sendTo(presence, 'presence', <IPCPresence>{
+            type: 3
+          });
+          window.removeEventListener('keydown', this.openDiscord, false);
+        },
+        false
+      );
       this.handshake();
       window.addEventListener('contextmenu', e => {
         e.preventDefault();
         ipcRenderer.send('ctx-mnu');
       });
       ipcRenderer.on('ctx-mnu-itm', (e, btn) => {
-        switch(btn) {
+        switch (btn) {
           case 'sneaky-menu':
             eWindow.webContents.openDevTools();
             break;
@@ -335,7 +379,7 @@
         });
         presence = -1;
         setTimeout(this.handshake, 200);
-      }, restPeriod);
+      }, 1e4);
     }
 
     handshake() {
@@ -583,7 +627,7 @@
       alertTimeout = setTimeout(async () => {
         if ((<HTMLInputElement>e.target).value !== '') {
           this.$parent.$parent.temporaryToast(
-            "Restarting presence service with new app ID..",
+            'Restarting presence service with new app ID..',
             5000
           );
           ipcRenderer.sendTo(presence, 'presence', <IPCPresence>{
@@ -593,11 +637,11 @@
             `https://discord.com/api/oauth2/applications/${this.getAppID}/assets`
           );
           this.assets = await assetsRes.json();
-          this.setLargeImage({key: null, text: ''});
-          this.setSmallImage({key: null, text: ''});
-        }else {
+          this.setLargeImage({ key: null, text: '' });
+          this.setSmallImage({ key: null, text: '' });
+        } else {
           this.$parent.$parent.temporaryToast(
-            "Please provide an app ID!",
+            'Please provide an app ID!',
             5000
           );
           if (!eWindow.isFocused()) eWindow.focus();
@@ -606,7 +650,13 @@
       }, 2000);
     }
     setAppSettings(e: Event) {
-      ipcRenderer.send('setSettings', (<HTMLInputElement>e.target).name, (<HTMLInputElement>e.target).type === 'checkbox' ? (<HTMLInputElement>e.target).checked : (<HTMLInputElement>e.target).value);
+      ipcRenderer.send(
+        'setSettings',
+        (<HTMLInputElement>e.target).name,
+        (<HTMLInputElement>e.target).type === 'checkbox'
+          ? (<HTMLInputElement>e.target).checked
+          : (<HTMLInputElement>e.target).value
+      );
       ipcRenderer.once('setSettings', (e, json) => {
         this.appSettings = json;
       });
