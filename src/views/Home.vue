@@ -202,6 +202,10 @@
         @input="this.appID"
       />
 
+      <button class="button" @click="this.openWikiPage"
+        >Learn how to make your own application</button
+      >
+
       <label class="container">
         <input
           type="checkbox"
@@ -660,6 +664,11 @@
       ipcRenderer.once('setSettings', (e, json) => {
         this.appSettings = json;
       });
+    }
+    openWikiPage() {
+      shell.openExternal(
+        'https://github.com/AlekEagle/discord-rpc/wiki/Creating-an-application-for-Discord-RPC'
+      );
     }
   }
 </script>
