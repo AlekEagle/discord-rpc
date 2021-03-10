@@ -201,11 +201,10 @@
         :value="this.getAppID"
         @input="this.appID"
       />
-
+      <br />
       <button class="button" @click="this.openWikiPage"
         >Learn how to make your own application</button
       >
-
       <label class="container">
         <input
           type="checkbox"
