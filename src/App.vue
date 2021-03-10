@@ -178,6 +178,10 @@
     background: #292929;
   }
 
+  ::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+
   .container {
     display: block;
     position: relative;
