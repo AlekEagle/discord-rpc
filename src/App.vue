@@ -10,6 +10,12 @@
   import Toast from '@/components/Toast.vue';
   import Header from '@/components/Header.vue';
   import { Vue, Options } from 'vue-class-component';
+  import * as Sentry from '@sentry/electron';
+  import { sentryAuthToken } from '../secrets.json';
+
+  Sentry.init({
+    dsn: `https://${sentryAuthToken}@o238460.ingest.sentry.io/1416510`
+  });
 
   @Options({
     components: {

@@ -5,8 +5,22 @@ import {
   BrowserWindow,
   ipcMain,
   Menu,
-  MenuItem
+  MenuItem,
+  crashReporter
 } from 'electron';
+import * as Sentry from '@sentry/electron';
+import { sentryAuthToken } from '../secrets.json';
+
+Sentry.init({
+  dsn: `https://${sentryAuthToken}@o238460.ingest.sentry.io/1416510`
+});
+crashReporter.start({
+  companyName: 'alek-evans',
+  productName: 'discord-rpc',
+  ignoreSystemCrashHandler: true,
+  submitURL: `https://o238460.ingest.sentry.io/api/1416510/minidump/?sentry_key=${sentryAuthToken}`,
+  compress: true
+});
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import { Settings } from './electron/settings';
@@ -29,6 +43,7 @@ if (!settings.has('autostart')) settings.set('autostart', true);
     autoLaunch.disable();
 })();
 if (!settings.has('showonstart')) settings.set('showonstart', false);
+
 async function createWindow() {
   if (!mainWindow) {
     // Create the browser window.
