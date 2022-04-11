@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "com.alekeagle.discord-rpc",
+  "asar": true,
+  "icon": "icon",
+  "linux": {
+    "category": "Utility",
+    "target": ["AppImage", "deb", "rpm", "snap", "tar.gz", "zip"]
+  },
+  "win": {
+    "target": ["nsis", "portable", "zip"]
+  },
+  "mac": {
+    "category": "Utility",
+    "target": ["dmg", "mas", "pkg", "zip"]
+  }
+}
