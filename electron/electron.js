@@ -1,5 +1,5 @@
 const { join } = require('path');
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 
 const isDev =
   process.env.IS_DEV === 'true' || process.env.NODE_ENV === 'development';

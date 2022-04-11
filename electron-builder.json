@@ -5,13 +5,20 @@
   "icon": "icon",
   "linux": {
     "category": "Utility",
-    "target": ["AppImage", "deb", "rpm", "snap", "tar.gz", "zip"]
+    "target": ["AppImage", "deb", "tar.gz", "zip"],
+    "desktop": {
+      "Name": "Discord RPC",
+      "Comment": "Discord RPC",
+      "Icon": "icon"
+    },
+    "maintainer": "discord-rpc@alekeagle.com"
   },
   "win": {
     "target": ["nsis", "portable", "zip"]
   },
-  "mac": {
-    "category": "Utility",
-    "target": ["dmg", "mas", "pkg", "zip"]
-  }
+  "directories": {
+    "output": "dist-electron",
+    "buildResources": "build-res"
+  },
+  "target": ["linux", "win"]
 }

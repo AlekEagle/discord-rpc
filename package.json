@@ -1,8 +1,10 @@
 {
   "name": "discord-rpc",
   "private": true,
-  "version": "2.0.0",
+  "version": "0.2.0",
   "description": "An application to control Discord's Rich Presence!",
+  "email": "discord-rpc@alekeagle.com",
+  "author": "Alek Evans",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
@@ -16,6 +18,7 @@
   },
   "main": "electron/electron.js",
   "dependencies": {
+    "discord-rpc": "^4.0.1",
     "vue": "^3.2.25"
   },
   "devDependencies": {
