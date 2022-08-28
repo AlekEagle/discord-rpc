@@ -213,7 +213,7 @@
           @change="this.setAppSettings"
         />
         <span class="checkmark"></span
-        ><a style="color: #00000000;font-size: 22px;">__</a> Automaticlly start
+        ><a style="color: #00000000;font-size: 22px;">__</a> Automatically start
         at startup?
       </label>
       <label class="container">
